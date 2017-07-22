@@ -23,16 +23,12 @@ module.exports = {
 
       const snakeCase = _.snakeCase(column);
 
-      let str = '';
+      let str = table ? `${table}.` : '';
 
       if (snakeCase !== column) {
         str += `${snakeCase} as "${column}"`;
       } else {
         str += column;
-      }
-
-      if (table) {
-        str = `${table}.${str}`;
       }
 
       return str;
