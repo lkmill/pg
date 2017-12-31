@@ -1,18 +1,18 @@
-'use strict';
+'use strict'
 
-const pg = require('pg');
+const pg = require('pg')
 
-function transaction(client) {
+function transaction (client) {
   return {
-    commit() {
+    commit () {
       return client.query('COMMIT;').then(() => {
-        client.release();
+        client.release()
       }).catch((err) => this.rollback().then(() => {
-        throw err;
-      }));
+        throw err
+      }))
     },
 
-    rollback() {
+    rollback () {
       return client.query('ROLLBACK;').then(() => {
         // if there was a problem rolling back the query
         // something is seriously messed up.  Return the error
@@ -20,49 +20,49 @@ function transaction(client) {
         // the pool.  If you leave a client in the pool with an unaborted
         // transaction weird, hard to diagnose problems might happen.
 
-        client.release();
-      });
+        client.release()
+      })
     },
 
-    query(...args) {
-      if (!args[0]) throw new Error('You need to supply a string as a query');
+    query (...args) {
+      if (!args[0]) throw new Error('You need to supply a string as a query')
 
       return client.query(...args)
         .catch((err) => this.rollback().then(() => {
-          throw err;
-        }));
+          throw err
+        }))
     },
-  };
+  }
 }
 
 module.exports = (conf) => {
-  const pool = (conf instanceof pg.Pool) ? conf : new pg.Pool(conf);
+  const pool = (conf instanceof pg.Pool) ? conf : new pg.Pool(conf)
 
   return {
-    end(...args) {
-      return pool.end(...args);
+    end (...args) {
+      return pool.end(...args)
     },
 
-    query(...args) {
-      if (!args[0]) throw new Error('You need to supply a string as a query');
+    query (...args) {
+      if (!args[0]) throw new Error('You need to supply a string as a query')
 
-      return pool.query(...args);
+      return pool.query(...args)
     },
 
-    connect(...args) {
-      return pool.connect(...args);
+    connect (...args) {
+      return pool.connect(...args)
     },
 
-    begin() {
+    begin () {
       return pool.connect().then((client) => {
-        const t = transaction(client);
+        const t = transaction(client)
 
         return t.query('BEGIN;')
           .then(() => t)
           .catch((err) => t.rollback().then(() => {
-            throw err;
-          }));
-      });
+            throw err
+          }))
+      })
     },
-  };
-};
+  }
+}

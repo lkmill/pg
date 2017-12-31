@@ -1,11 +1,11 @@
-'use strict';
+'use strict'
 
 module.exports = {
-  one(result) {
-    return result.rows ? result.rows[0] : undefined;
+  one (result) {
+    return result.rows ? result.rows[0] : undefined
   },
 
-  many(result) {
-    return result.rows ? result.rows : [];
+  many (result) {
+    return result.rows ? result.rows : []
   },
-};
+}
