@@ -1,5 +1,5 @@
 {
-  "name": "easy-postgres",
+  "name": "@bmp/pg",
   "version": "0.0.1",
   "description": "postgres",
   "main": "index.js",
