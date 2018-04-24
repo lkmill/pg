@@ -1,6 +1,6 @@
 {
   "name": "@bmp/pg",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "postgres",
   "main": "index.js",
   "scripts": {
