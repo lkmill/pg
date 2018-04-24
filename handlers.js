@@ -181,15 +181,43 @@ const factories = {
     }
   },
 
+  // should be used with PUT
+  replace ({ db, table, columns, emitter, mapKeys }) {
+    const columnsString = sql.columns(columns)
+
+    const empty = columns.reduce((obj, key) => {
+      obj[key] = null
+
+      return obj
+    }, {})
+
+    return function replace (id, json, client = db) {
+      json = _.defaults(_.pick(json, columns), empty)
+
+      let keys = Object.keys(json)
+
+      if (mapKeys) {
+        keys = keys.map(mapKeys)
+      }
+
+      const values = Object.values(json)
+
+      const query = `UPDATE ${table} SET ${keys.map((key, i) => `${key}=$${i + 1}`).join(', ')} WHERE id = $${keys.length + 1} RETURNING ${columnsString};`
+
+      return client.query(query, [...values, id]).then((result) => {
+        if (emitter) emitter.emit('db', {table, action: 'update', item: result.rows[0]})
+
+        return result.rows[0]
+      })
+    }
+  },
+
+  // should be used with PATCH
   update ({ db, table, columns, emitter, mapKeys }) {
     const columnsString = sql.columns(columns)
 
-    // changes properties passed on req.body
-    // SHOULD be used with PATCH
     return function update (id, json, client = db) {
-      // enable using using _hid (not that _id MUST be a ObjectId)
-
-      json = _.pickBy(json, (value, key) => columns.includes(key))
+      json = _.pick(json, columns)
 
       let keys = Object.keys(json)
 
