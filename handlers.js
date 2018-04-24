@@ -140,6 +140,16 @@ const factories = {
     }
   },
 
+  selectById ({ db, table, columns }) {
+    columns = sql.columns(columns)
+
+    const query = `SELECT ${columns} FROM ${table} WHERE id = $1;`
+
+    return function selectById (id, client = db) {
+      return client.query(query, [ id ]).then(one)
+    }
+  },
+
   selectOne ({ db, table, columns }) {
     columns = sql.columns(columns)
 
