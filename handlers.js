@@ -23,10 +23,10 @@ const factories = {
     }
   },
 
-  insert ({ db, table, columns, emitter, mapKeys }) {
+  create ({ db, table, columns, emitter, mapKeys }) {
     const columnsString = sql.columns(columns)
 
-    return function insert (json, client = db) {
+    return function create (json, client = db) {
       json = _.pickBy(json, (value, key) => !_.isUndefined(value) && columns.includes(key))
 
       let keys = Object.keys(json)
@@ -49,10 +49,10 @@ const factories = {
     }
   },
 
-  insertMany ({ db, table, columns, emitter, mapKeys }) {
+  createMany ({ db, table, columns, emitter, mapKeys }) {
     const columnsString = sql.columns(columns)
 
-    return function insertMany (collection, client = db) {
+    return function createMany (collection, client = db) {
       if (!Array.isArray(collection)) {
         collection = [collection]
       }
@@ -94,10 +94,10 @@ const factories = {
     }
   },
 
-  select ({ db, table, columns, emitter, defaults = {} }) {
+  find ({ db, table, columns, emitter, defaults = {} }) {
     const columnsString = sql.columns(columns)
 
-    return function select (json, client = db) {
+    return function find (json, client = db) {
       const {
         offset = defaults.offset,
         limit = defaults.limit,
@@ -130,30 +130,20 @@ const factories = {
     }
   },
 
-  selectAll ({ db, table, columns }) {
-    columns = sql.columns(columns)
-
-    const query = `SELECT ${columns} FROM ${table} ORDER BY id DESC;`
-
-    return function selectAll (client = db) {
-      return client.query(query).then(many)
-    }
-  },
-
-  selectById ({ db, table, columns }) {
+  findById ({ db, table, columns }) {
     columns = sql.columns(columns)
 
     const query = `SELECT ${columns} FROM ${table} WHERE id = $1;`
 
-    return function selectById (id, client = db) {
+    return function findById (id, client = db) {
       return client.query(query, [ id ]).then(one)
     }
   },
 
-  selectOne ({ db, table, columns }) {
+  findOne ({ db, table, columns }) {
     columns = sql.columns(columns)
 
-    return function selectOne (json, client = db) {
+    return function findOne (json, client = db) {
       let query = `SELECT ${columns} FROM ${table}`
 
       let values
@@ -166,6 +156,16 @@ const factories = {
       query += ' LIMIT 1;'
 
       return client.query(query, values).then(one)
+    }
+  },
+
+  getAll ({ db, table, columns }) {
+    columns = sql.columns(columns)
+
+    const query = `SELECT ${columns} FROM ${table} ORDER BY id DESC;`
+
+    return function getAll (client = db) {
+      return client.query(query).then(many)
     }
   },
 
