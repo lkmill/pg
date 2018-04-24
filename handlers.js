@@ -26,7 +26,7 @@ const factories = {
   insert ({ db, table, columns, emitter, mapKeys }) {
     const columnsString = sql.columns(columns)
 
-    return function create (json, client = db) {
+    return function insert (json, client = db) {
       json = _.pickBy(json, (value, key) => !_.isUndefined(value) && columns.includes(key))
 
       let keys = Object.keys(json)
@@ -52,7 +52,7 @@ const factories = {
   insertMany ({ db, table, columns, emitter, mapKeys }) {
     const columnsString = sql.columns(columns)
 
-    return function create (collection, client = db) {
+    return function insertMany (collection, client = db) {
       if (!Array.isArray(collection)) {
         collection = [collection]
       }
@@ -97,7 +97,7 @@ const factories = {
   select ({ db, table, columns, emitter, defaults = {} }) {
     const columnsString = sql.columns(columns)
 
-    return function find (json, client = db) {
+    return function select (json, client = db) {
       const {
         offset = defaults.offset,
         limit = defaults.limit,
@@ -135,7 +135,7 @@ const factories = {
 
     const query = `SELECT ${columns} FROM ${table} ORDER BY id DESC;`
 
-    return function getAll (client = db) {
+    return function selectAll (client = db) {
       return client.query(query).then(many)
     }
   },
@@ -143,7 +143,7 @@ const factories = {
   selectOne ({ db, table, columns }) {
     columns = sql.columns(columns)
 
-    return function findOne (json, client = db) {
+    return function selectOne (json, client = db) {
       let query = `SELECT ${columns} FROM ${table}`
 
       let values
